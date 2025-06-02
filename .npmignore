@@ -1,0 +1,61 @@
+# Source code
+src/
+
+# Tests
+tests/
+test/
+__tests__/
+*.spec.ts
+*.test.ts
+
+# Configuration files
+.github/
+.eslintrc*
+.prettier*
+.editorconfig
+.travis.yml
+tsconfig.json
+eslint.config.mjs
+jest.config.js
+
+# Demo and examples
+demo.ts
+examples/
+
+# Documentation source
+docs/
+
+# Git related
+.git/
+.gitignore
+
+# CI/CD
+.gitlab-ci.yml
+.circleci/
+# Logs
+logs/
+*.log
+
+# IDE settings
+.idea/
+.vscode/
+.DS_Store
+
+# Dependency directories
+node_modules/
+
+# Debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env*
+
+# Misc
+*.tgz
+coverage/
+.nyc_output/
+.cache/
+.tmp/
+http[^\s]+

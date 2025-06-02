@@ -1,0 +1,65 @@
+{
+  "name": "snaf",
+  "version": "1.0.0",
+  "description": "Lightweight, accurate, multi-framework XSS scanner.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "demo": "ts-node demo.ts",
+    "lint": "eslint 'src/**/*.{js,ts}'",
+    "format": "prettier --write 'src/**/*.{js,ts,json,md}'",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "prepublishOnly": "npm run lint && npm run build",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "security",
+    "firewall",
+    "xss",
+    "express",
+    "nextjs",
+    "middleware",
+    "sarp",
+    "protection"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sarp75/snaf.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sarp75/snaf/issues"
+  },
+  "homepage": "https://github.com/sarp75/snaf#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.29",
+    "@typescript-eslint/eslint-plugin": "^8.33.0",
+    "@typescript-eslint/parser": "^8.33.0",
+    "axios": "^1.9.0",
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
+    "globals": "^16.2.0",
+    "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0"
+  },
+  "peerDependencies": {
+    "express": ">=4.0.0",
+    "next": ">=12.0.0"
+  }
+}
