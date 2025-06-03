@@ -36,7 +36,7 @@ const XSS_PATTERNS = {
     eventHandlers: /\s+on\w+\s*=\s*(['"`]?)[^>]*\1/gi,
     genericEvent: /on\w+\s*=/gi,
     unquotedEventHandlers: /<[^>]*\s+on\w+\s*=\s*[^'"` >][^>]*/gi,
-    jsUris: /\b(href|src|action|data)\s*=\s*(['"`])(?:\s*javascript:).*?\2/gi,
+    jsUris: /\b(href|src|action|data)\s*=\s*(['"`])\s*javascript:.*?\2/gi,
     directEval: /\beval\s*\(/gi,
     newFunction: /\bnew\s+Function\s*\(/gi,
     functionConstructor: /\bFunction\s*\(/gi,
@@ -81,10 +81,11 @@ export class XssModule implements SnafModule {
   name = "xss";
   enabled = true;
   private config: XssModuleConfig;
-  private customPatterns: RegExp[] = [];
+  private readonly customPatterns: RegExp[] = [];
   private whitelistedDomains: Set<string> = new Set();
+  // noinspection JSMismatchedCollectionQueryUpdate
   private whitelistedPaths: Set<string> = new Set();
-  private reportOnly: boolean = false;
+  private readonly reportOnly: boolean = false;
 
   constructor(config: XssModuleConfig) {
     this.config = config;
@@ -234,7 +235,7 @@ export class XssModule implements SnafModule {
 
   // Process JavaScript context XSS vectors
   private processJavaScriptContext(
-    ctx: SnafContext,
+    _ctx: SnafContext,
     bodyClone: any,
     queryClone: any,
     result: XssDetectionResult,
@@ -253,7 +254,7 @@ export class XssModule implements SnafModule {
 
   // Process HTML context XSS vectors
   private processHtmlContext(
-    ctx: SnafContext,
+    _ctx: SnafContext,
     bodyClone: any,
     queryClone: any,
     result: XssDetectionResult,
@@ -300,7 +301,7 @@ export class XssModule implements SnafModule {
 
   // Process URL context XSS vectors
   private processUrlContext(
-    ctx: SnafContext,
+    _ctx: SnafContext,
     bodyClone: any,
     queryClone: any,
     result: XssDetectionResult,
@@ -319,7 +320,7 @@ export class XssModule implements SnafModule {
 
   // Process CSS context XSS vectors
   private processCssContext(
-    ctx: SnafContext,
+    _ctx: SnafContext,
     bodyClone: any,
     queryClone: any,
     result: XssDetectionResult,
@@ -337,9 +338,9 @@ export class XssModule implements SnafModule {
   }
 
   private processFormInputs(
-    ctx: SnafContext,
+    _ctx: SnafContext,
     bodyClone: any,
-    queryClone: any,
+    _queryClone: any,
     result: XssDetectionResult,
   ): void {
     const iframePattern = /<iframe\b[^>]*>/gi;
@@ -439,7 +440,7 @@ export class XssModule implements SnafModule {
   }
 
   private processCustomPatterns(
-    ctx: SnafContext,
+    _ctx: SnafContext,
     bodyClone: any,
     queryClone: any,
     result: XssDetectionResult,
@@ -461,7 +462,7 @@ export class XssModule implements SnafModule {
   }
 
   private checkSensitiveParams(
-    ctx: SnafContext,
+    _ctx: SnafContext,
     bodyClone: any,
     queryClone: any,
     result: XssDetectionResult,
