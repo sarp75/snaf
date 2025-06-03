@@ -15,7 +15,7 @@ interface XssDetectionResult {
 const XSS_PATTERNS = {
   // HTML context patterns
   html: {
-    scriptTags: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    scriptTags: /<script\b[^>]*>[\s\S]*?<\/script\s*[^>]*>/gi,
     dangerousTags:
       /<(iframe|object|embed|form|applet|meta|base|link)\b[^>]*>/gi,
     dangerousAttributes:
@@ -361,6 +361,7 @@ export class XssModule implements SnafModule {
       result.contexts.add("html");
     }
   }
+
   private normalizeInput(obj: any): void {
     if (!obj) return;
     for (const key in obj) {
@@ -371,6 +372,7 @@ export class XssModule implements SnafModule {
       }
     }
   }
+
   // idk if this is safe
   private decodeSafe(str: string): string {
     if (!str) return str;
@@ -401,6 +403,7 @@ export class XssModule implements SnafModule {
         String.fromCharCode(parseInt(dec, 10)),
       );
   }
+
   private processUserGeneratedContent(
     ctx: SnafContext,
     bodyClone: any,
@@ -482,7 +485,13 @@ export class XssModule implements SnafModule {
 
           // Sanitize by completely removing HTML
           const original = bodyClone[param];
-          bodyClone[param] = bodyClone[param].replace(/<[^>]*>/g, "");
+          let sanitized = bodyClone[param];
+          let previous = "";
+          while (sanitized !== previous) {
+            previous = sanitized;
+            sanitized = sanitized.replace(/<[^>]*>/g, "");
+          }
+          bodyClone[param] = sanitized;
           result.sanitizedFields[param] = {
             original,
             sanitized: bodyClone[param],
@@ -500,7 +509,13 @@ export class XssModule implements SnafModule {
 
           // Sanitize by completely removing HTML
           const original = queryClone[param];
-          queryClone[param] = queryClone[param].replace(/<[^>]*>/g, "");
+          let sanitized = queryClone[param];
+          let previous = "";
+          while (sanitized !== previous) {
+            previous = sanitized;
+            sanitized = sanitized.replace(/<[^>]*>/g, "");
+          }
+          queryClone[param] = sanitized;
           result.sanitizedFields[param] = {
             original,
             sanitized: queryClone[param],
