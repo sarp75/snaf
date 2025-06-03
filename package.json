@@ -15,8 +15,7 @@
     "lint": "eslint 'src/**/*.{js,ts}'",
     "format": "prettier --write 'src/**/*.{js,ts,json,md}'",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "prepublishOnly": "npm run lint && npm run build",
-    "test": "echo \"No tests yet\""
+    "ready": "npm run lint && npm run build"
   },
   "keywords": [
     "security",
