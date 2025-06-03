@@ -1,6 +1,6 @@
 {
   "name": "snaf",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Lightweight, accurate, multi-framework XSS scanner.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
