@@ -8,6 +8,7 @@ import { createExpressMiddleware } from "./adapters/express";
 import { createNextMiddleware } from "./adapters/next";
 
 import { XssModule } from "./modules/xss";
+import {createFastifyPlugin} from "./adapters/fastify";
 
 // main snaf class that users will interact with
 export class Snaf {
@@ -45,7 +46,10 @@ export class Snaf {
   nextjs() {
     return createNextMiddleware(this.core, this.config);
   }
-  // fastify() { ... }
+  fastify() {
+    return createFastifyPlugin(this.core, this.config);
+  }
+
   // koa() { ... }
 
   // enable/disable specific module

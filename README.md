@@ -83,6 +83,31 @@ export default snaf.nextjs()(async function handler() {
 });
 ```
 
+### Fastify
+
+```ts
+const fastify = require("fastify")();
+const { createSnaf } = require("snaf");
+
+const snaf = createSnaf({
+  modules: {
+    xss: {
+      enabled: true,
+      blockMode: "sanitize",
+    },
+  },
+});
+
+// Register SNAF as a Fastify plugin
+fastify.register(snaf.fastify());
+
+fastify.get("/", async (request, reply) => {
+  return "Hello, secure world!";
+});
+
+fastify.listen({ port: 3000 });
+```
+
 ## Configuration Options <a id="config"></a>
 
 ```ts
@@ -144,18 +169,18 @@ Add a custom module.
 Below is a comparison of SNAF with other popular Node.js XSS protection libraries:
 
 | Feature              | SNAF  | xss-clean | helmet | DOMPurify (Node) |
-|----------------------|:-----:|:---------:|:------:|:----------------:|
-| XSS Detection        |   ✅   |     ✅     |   ❌    |        ✅         |
-| XSS Sanitization     |   ✅   |     ✅     |   ❌    |        ✅         |
-| Block Mode           |   ✅   |     ❌     |   ❌    |        ❌         |
-| Configurable         |   ✅   |    ⚠️     |   ⚠️   |        ✅         |
-| Zero Dependencies?   |   ✅   |     ❌     |   ✅    |        ❌         |
-| TypeScript Support   |   ✅   |    ⚠️     |   ⚠️   |        ✅         |
+| -------------------- | :---: | :-------: | :----: | :--------------: |
+| XSS Detection        |  ✅   |    ✅     |   ❌   |        ✅        |
+| XSS Sanitization     |  ✅   |    ✅     |   ❌   |        ✅        |
+| Block Mode           |  ✅   |    ❌     |   ❌   |        ❌        |
+| Configurable         |  ✅   |    ⚠️     |   ⚠️   |        ✅        |
+| Zero Dependencies?   |  ✅   |    ❌     |   ✅   |        ❌        |
+| TypeScript Support   |  ✅   |    ⚠️     |   ⚠️   |        ✅        |
 | Average Latency (ms) | 1.127 |   ~2.3    |  ~0.5  |      ~11.38      |
-| Maintained           |   ✅   |    ⚠️     |   ⚠️   |        ⚠️        |
-| Handles Evasion      |   ✅   |     ❌     |   ❌    |        ❌         |
-| Granular Control     |   ✅   |     ❌     |   ❌    |        ❌         |
-| Real-World Coverage  |   ✅   |    ⚠️     |   ❌    |        ⚠️        |
+| Maintained           |  ✅   |    ⚠️     |   ⚠️   |        ⚠️        |
+| Handles Evasion      |  ✅   |    ❌     |   ❌   |        ❌        |
+| Granular Control     |  ✅   |    ❌     |   ❌   |        ❌        |
+| Real-World Coverage  |  ✅   |    ⚠️     |   ❌   |        ⚠️        |
 
 #### ⚠️ = Partial/limited, ✅ = Yes, ❌ = No
 
