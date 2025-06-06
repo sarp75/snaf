@@ -1,6 +1,6 @@
 {
   "name": "snaf",
-  "version": "1.0.13",
+  "version": "1.1.1",
   "description": "Lightweight, accurate, multi-framework XSS scanner.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -59,8 +59,12 @@
     "typescript-eslint": "^8.33.0"
   },
   "peerDependencies": {
+    "@adonisjs/core": "^6.18.0",
+    "@hapi/hapi": "^21.4.0",
     "express": ">=3.0.0",
     "fastify": "^5.3.3",
+    "hono": "^4.7.11",
+    "koa": "^3.0.0",
     "next": ">=11.0.0"
   }
 }

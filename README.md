@@ -108,6 +108,98 @@ fastify.get("/", async (request, reply) => {
 fastify.listen({ port: 3000 });
 ```
 
+### Koa
+
+```ts
+const Koa = require("koa");
+const bodyParser = require("koa-bodyparser");
+const { createSnaf } = require("snaf");
+
+const app = new Koa();
+app.use(bodyParser());
+
+const snaf = createSnaf({
+  modules: {
+    xss: {
+      enabled: true,
+      blockMode: "sanitize",
+    },
+  },
+});
+
+// Add SNAF middleware
+app.use(snaf.koa());
+
+// Your normal routes
+app.use(async (ctx) => {
+  ctx.body = "Hello, secure world!";
+});
+app.listen(3000);
+```
+
+### Hono
+
+```ts
+import { Hono } from "hono";
+import { createSnaf } from "snaf";
+
+const app = new Hono();
+const snaf = createSnaf({
+  modules: {
+    xss: {
+      enabled: true,
+      blockMode: "sanitize",
+    },
+  },
+});
+
+// Add SNAF middleware
+app.use("*", snaf.hono());
+
+app.get("/", (c) => c.text("Hello, secure world!"));
+
+export default app;
+```
+
+### Hapi
+
+```ts
+const Hapi = require("@hapi/hapi");
+const { createSnaf } = require("snaf");
+
+const snaf = createSnaf({
+  modules: {
+    xss: {
+      enabled: true,
+      blockMode: "sanitize",
+    },
+  },
+});
+
+const init = async () => {
+  const server = Hapi.server({
+    port: 3000,
+    host: "localhost",
+  });
+
+  // Register SNAF as a Hapi plugin
+  await server.register(snaf.hapi());
+
+  server.route({
+    method: "GET",
+    path: "/",
+    handler: (request, h) => {
+      return "Hello, secure world!";
+    },
+  });
+
+  await server.start();
+  console.log("Server running on %s", server.info.uri);
+};
+
+init();
+```
+
 ## Configuration Options <a id="config"></a>
 
 ```ts

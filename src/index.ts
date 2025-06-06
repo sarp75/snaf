@@ -1,16 +1,19 @@
-// snaf (Sarp's Node App Firewall) main entry point
+// snaf main entry point
 // provides an easy-to-use api for setting up the firewall
 
 // mit license idk
-import { SnafCore } from "./core/xss";
-import { createConfig, SnafConfig } from "./config";
-import { createExpressMiddleware } from "./adapters/express";
-import { createNextMiddleware } from "./adapters/next";
+import {SnafCore} from "./core/xss";
+import {createConfig, SnafConfig} from "./config";
+import {createExpressMiddleware} from "./adapters/express";
+import {createNextMiddleware} from "./adapters/next";
 
-import { XssModule } from "./modules/xss";
+import {XssModule} from "./modules/xss";
 import {createFastifyPlugin} from "./adapters/fastify";
+import {createKoaMiddleware} from "./adapters/koa";
+import {createHonoMiddleware} from "./adapters/hono";
+import {createHapiPlugin} from "./adapters/hapi";
 
-// main snaf class that users will interact with
+// noinspection JSUnusedGlobalSymbols
 export class Snaf {
   private readonly core: SnafCore;
   private readonly config: SnafConfig;
@@ -46,11 +49,24 @@ export class Snaf {
   nextjs() {
     return createNextMiddleware(this.core, this.config);
   }
+
   fastify() {
     return createFastifyPlugin(this.core, this.config);
   }
 
-  // koa() { ... }
+  koa() {
+    return createKoaMiddleware(this.core, this.config);
+  }
+
+  hono() {
+    return createHonoMiddleware(this.core, this.config);
+  }
+
+  hapi() {
+    return createHapiPlugin(this.core, this.config);
+  }
+
+  // no adonis() {} as it creates conflicts
 
   // enable/disable specific module
   enableModule(name: string, enabled: boolean = true) {
@@ -62,7 +78,6 @@ export class Snaf {
   getCore() {
     return this.core;
   }
-
   // register built-in security modules based on config
   private registerDefaultModules() {
     // register xss module if enabled in config
