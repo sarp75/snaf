@@ -1,9 +1,8 @@
 name: publish to npm
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -25,7 +24,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: npm ci
       - run: npm run ready
-      - run: npm version patch --no-git-tag-version
+      - run: npm version ${{ github.event.release.tag_name }} --no-git-tag-version
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
