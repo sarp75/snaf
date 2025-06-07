@@ -17,15 +17,15 @@ A lightweight, accurate, multi-framework XSS scanner for Node.js applications.
 - [API Reference](#api)
 - [Comparison](#comparison)
 
-## Features <a id="features"></a>
+## Features <a id=“features”></a>
 
-- Robust XSS protection
-- Framework-agnostic with built-in adapters for many frameworks
-- Almost no performance impact
-- Highly configurable
-- Easy to integrate
-- No dependencies at all
-- Built with TypeScript for extra safety _(still works with JavaScript)_
+- **Advanced Security Testing**: Utilizes sophisticated XSS payloads from the [SecLists](https://github.com/danielmiessler/SecLists/tree/master/Fuzzing/XSS/robot-friendly) project to ensure comprehensive security coverage.
+- **Versatile Framework Compatibility**: Offers framework-agnostic functionality with integrated adapters for a wide range of frameworks.
+- **Minimal Performance Impact**: Designed to maintain optimal performance with negligible overhead.
+- **Extensive Customization Options**: Provides high configurability to meet specific needs and preferences.
+- **Seamless Integration**: Simplifies the integration process for developers.
+- **Zero Dependencies**: Operates independently without requiring any external dependencies.
+- **TypeScript-Based Development**: Constructed with TypeScript for enhanced safety, while remaining compatible with JavaScript.
 
 ## Installation
 
@@ -258,7 +258,7 @@ Add a custom module.
 
 ### 📊 Comparison Graphs <a id="comparison"></a>
 
-Below is a comparison of SNAF with other popular Node.js XSS protection libraries:
+Here is a comparative analysis of SNAF with other widely adopted Node.js XSS protection libraries:
 
 | Feature              | SNAF  | xss-clean | helmet | DOMPurify (Node) |
 | -------------------- | :---: | :-------: | :----: | :--------------: |
@@ -276,11 +276,11 @@ Below is a comparison of SNAF with other popular Node.js XSS protection librarie
 
 #### ⚠️ = Partial/limited, ✅ = Yes, ❌ = No
 
-- **xss-clean**: No longer maintained, misses advanced XSS vectors, and offers almost no configuration.
-- **helmet**: Not an XSS sanitizer; only sets HTTP headers, leaving your app vulnerable to XSS payloads.
-- **DOMPurify (Node)**: Heavy, slow, and not designed for server-side request sanitization.
-  Lacks block mode and
-  fine-grained control.
+- **xss-clean**: No longer maintained, it overlooks sophisticated XSS vectors and provides minimal configuration options.
+- **helmet**: Not an XSS sanitizer; it solely modifies HTTP headers, rendering your application susceptible to XSS payloads.
+- **DOMPurify (Node)**: A resource-intensive and sluggish tool, not suited for server-side request sanitization.
+It lacks the block mode and precise control features.
+
 
 ### License
 
