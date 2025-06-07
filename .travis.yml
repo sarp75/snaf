@@ -2,6 +2,8 @@ language: node_js
 node_js:
   - "20"
 
+dist: bionic
+
 # Only build on tags that look like a version (v1.2.3)
 branches:
   only:
@@ -26,4 +28,3 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    branch: master
