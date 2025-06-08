@@ -16,16 +16,21 @@ A lightweight, accurate, multi-framework XSS scanner for Node.js applications.
 - [Configuration Options](#config)
 - [API Reference](#api)
 - [Comparison](#comparison)
+- [Warnings](#warnings)
 
 ## Features <a id=“features”></a>
 
-- **Advanced Security Testing**: Utilizes sophisticated XSS payloads from the [SecLists](https://github.com/danielmiessler/SecLists/tree/master/Fuzzing/XSS/robot-friendly) project to ensure comprehensive security coverage.
-- **Versatile Framework Compatibility**: Offers framework-agnostic functionality with integrated adapters for a wide range of frameworks.
+- **Advanced Security Testing**: Utilizes sophisticated XSS payloads from
+  the [SecLists](https://github.com/danielmiessler/SecLists/tree/master/Fuzzing/XSS/robot-friendly) project to ensure
+  comprehensive security coverage.
+- **Versatile Framework Compatibility**: Offers framework-agnostic functionality with integrated adapters for a wide
+  range of frameworks.
 - **Minimal Performance Impact**: Designed to maintain optimal performance with negligible overhead.
 - **Extensive Customization Options**: Provides high configurability to meet specific needs and preferences.
 - **Seamless Integration**: Simplifies the integration process for developers.
 - **Zero Dependencies**: Operates independently without requiring any external dependencies.
-- **TypeScript-Based Development**: Constructed with TypeScript for enhanced safety, while remaining compatible with JavaScript.
+- **TypeScript-Based Development**: Constructed with TypeScript for enhanced safety, while remaining compatible with
+  JavaScript.
 
 ## Installation
 
@@ -93,7 +98,7 @@ const snaf = createSnaf({
   modules: {
     xss: {
       enabled: true,
-      blockMode: "sanitize",
+      blockMode: "block",
     },
   },
 });
@@ -122,7 +127,7 @@ const snaf = createSnaf({
   modules: {
     xss: {
       enabled: true,
-      blockMode: "sanitize",
+      blockMode: "remove",
     },
   },
 });
@@ -148,7 +153,7 @@ const snaf = createSnaf({
   modules: {
     xss: {
       enabled: true,
-      blockMode: "sanitize",
+      blockMode: "block",
     },
   },
 });
@@ -171,7 +176,7 @@ const snaf = createSnaf({
   modules: {
     xss: {
       enabled: true,
-      blockMode: "sanitize",
+      blockMode: "remove",
     },
   },
 });
@@ -216,7 +221,7 @@ const snaf = createSnaf({
       urlParameters: true, // search?q=alert('1')
       formInputs: true, // <input value="alert('1')">
       userGeneratedContent: true, // <textarea>user input</textarea>
-      blockMode: "sanitize", // 'block', 'sanitize', 'remove', or 'report'
+      blockMode: "block", // 'block', 'remove', or 'report'
       sensitiveParams: ["token", "password"], // sensitive url parameters
       whitelistedDomains: ["trusted-domain.com"], // trust this domain blindly
       whitelistedPaths: ["/images/"], // allow specific paths
@@ -256,31 +261,49 @@ Enable or disable a specific module, specified by name.
 
 Add a custom module.
 
-### 📊 Comparison Graphs <a id="comparison"></a>
+### Comparison Graphs <a id="comparison"></a>
 
 Here is a comparative analysis of SNAF with other widely adopted Node.js XSS protection libraries:
 
 | Feature              | SNAF  | xss-clean | helmet | DOMPurify (Node) |
-| -------------------- | :---: | :-------: | :----: | :--------------: |
-| XSS Detection        |  ✅   |    ✅     |   ❌   |        ✅        |
-| XSS Sanitization     |  ✅   |    ✅     |   ❌   |        ✅        |
-| Block Mode           |  ✅   |    ❌     |   ❌   |        ❌        |
-| Configurable         |  ✅   |    ⚠️     |   ⚠️   |        ✅        |
-| Zero Dependencies?   |  ✅   |    ❌     |   ✅   |        ❌        |
-| TypeScript Support   |  ✅   |    ⚠️     |   ⚠️   |        ✅        |
+|----------------------|:-----:|:---------:|:------:|:----------------:|
+| XSS Detection        |   ✅   |     ✅     |   ❌    |        ✅         |
+| XSS Sanitization     |   ✅   |     ✅     |   ❌    |        ✅         |
+| Block Mode           |   ✅   |     ❌     |   ❌    |        ❌         |
+| Configurable         |   ✅   |    ⚠️     |   ⚠️   |        ✅         |
+| Zero Dependencies?   |   ✅   |     ❌     |   ✅    |        ❌         |
+| TypeScript Support   |   ✅   |    ⚠️     |   ⚠️   |        ✅         |
 | Average Latency (ms) | 1.127 |   ~2.3    |  ~0.5  |      ~11.38      |
-| Maintained           |  ✅   |    ⚠️     |   ⚠️   |        ⚠️        |
-| Handles Evasion      |  ✅   |    ❌     |   ❌   |        ❌        |
-| Granular Control     |  ✅   |    ❌     |   ❌   |        ❌        |
-| Real-World Coverage  |  ✅   |    ⚠️     |   ❌   |        ⚠️        |
+| Maintained           |   ✅   |    ⚠️     |   ⚠️   |        ⚠️        |
+| Handles Evasion      |   ✅   |     ❌     |   ❌    |        ❌         |
+| Granular Control     |   ✅   |     ❌     |   ❌    |        ❌         |
+| Real-World Coverage  |   ✅   |    ⚠️     |   ❌    |        ⚠️        |
 
 #### ⚠️ = Partial/limited, ✅ = Yes, ❌ = No
 
-- **xss-clean**: No longer maintained, it overlooks sophisticated XSS vectors and provides minimal configuration options.
-- **helmet**: Not an XSS sanitizer; it solely modifies HTTP headers, rendering your application susceptible to XSS payloads.
+- **xss-clean**: No longer maintained, it overlooks sophisticated XSS vectors and provides minimal configuration
+  options.
+- **helmet**: Not an XSS sanitizer; it solely modifies HTTP headers, rendering your application susceptible to XSS
+  payloads.
 - **DOMPurify (Node)**: A resource-intensive and sluggish tool, not suited for server-side request sanitization.
-It lacks the block mode and precise control features.
+  It lacks the block mode and precise control features.
 
+### What SNAF Should Not Be Used For <a id="warnings"></a>
+
+- **Sanitization**: SNAF is not a sanitization library. It blocks malicious requests and sanitizes them if configured to
+  do so.
+- **Input Validation**: SNAF is not designed for validating user input.
+  Use libraries like `joi` or `express-validator` for that purpose.
+- **Rate Limiting**: SNAF does not provide rate limiting features. 
+  Use libraries like `express-rate-limit` for that
+  purpose.
+- **General Security**: SNAF is focused on XSS protection. 
+ For comprehensive security, consider using it alongside other
+  security measures such as HTTPS, authentication, and authorization.
+- **Blind Trust**: Do not blindly trust user input or external data sources. 
+Always validate and sanitize inputs as
+  necessary.
+  Do not solely rely on SNAF for security.
 
 ### License
 

@@ -1,6 +1,22 @@
 import { SnafAction, SnafContext, SnafModule } from "../core/xss";
 import { XssModuleConfig } from "../config";
 
+/*
+* TODO (sorted by urgency):
+*
+* 1. Header Inspection: Extend detection to HTTP headers (e.g., User-Agent, Referer) which can also contain XSS payloads.
+* 2. Multi-stage Payload Detection: Identify fragmented XSS vectors that assemble across multiple parameters.
+* 3. Advanced Unicode Detection: Add specialized patterns for Unicode normalization attacks and zero-width character exploits.
+* 4. Homoglyph Attack Detection: Add patterns for look-alike character substitutions used to bypass filters.
+* 5. Base64/Encoded Payload Scanning: Improved detection for various encoding techniques.
+* 6. Context-Aware Detection: Different pattern sets based on insertion context (HTML vs URL vs JS).
+* 7. Dangling Markup Injection: Specific patterns for broken/incomplete tags that can lead to XSS.
+* 8. Mutation-Based Detection: Consider payloads that mutate during browser processing.
+* 9. DOM Clobbering Detection: Identify patterns that exploit DOM property clobbering.
+* 10. Template Literal Analysis: Enhanced detection for JavaScript template literal-based attacks.
+* 11. Browser Fingerprinting: Detect browser-specific XSS vectors that target particular rendering engines.
+*/
+
 // A big fucking hole coming right up to termux kiddos
 interface XssDetectionResult {
   detected: boolean;
@@ -526,6 +542,7 @@ export class XssModule implements SnafModule {
   }
 
   // Enhanced check and sanitize function that maintains record of sanitized fields
+  // WARNING: this function is not recommended for use in production without thorough testing
   private checkAndSanitize(
     obj: any,
     pattern: RegExp,
