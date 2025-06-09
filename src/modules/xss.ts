@@ -4,7 +4,6 @@ import { XssModuleConfig } from "../config";
 /*
 * TODO (sorted by urgency):
 *
-* 1. Header Inspection: Extend detection to HTTP headers (e.g., User-Agent, Referer) which can also contain XSS payloads.
 * 2. Multi-stage Payload Detection: Identify fragmented XSS vectors that assemble across multiple parameters.
 * 3. Advanced Unicode Detection: Add specialized patterns for Unicode normalization attacks and zero-width character exploits.
 * 4. Homoglyph Attack Detection: Add patterns for look-alike character substitutions used to bypass filters.
@@ -13,8 +12,6 @@ import { XssModuleConfig } from "../config";
 * 7. Dangling Markup Injection: Specific patterns for broken/incomplete tags that can lead to XSS.
 * 8. Mutation-Based Detection: Consider payloads that mutate during browser processing.
 * 9. DOM Clobbering Detection: Identify patterns that exploit DOM property clobbering.
-* 10. Template Literal Analysis: Enhanced detection for JavaScript template literal-based attacks.
-* 11. Browser Fingerprinting: Detect browser-specific XSS vectors that target particular rendering engines.
 */
 
 // A big fucking hole coming right up to termux kiddos
@@ -140,8 +137,15 @@ export class XssModule implements SnafModule {
     // Clone objects to avoid mutating the original during analysis
     const bodyClone = ctx.body ? this.deepClone(ctx.body) : {};
     const queryClone = ctx.query ? this.deepClone(ctx.query) : {};
+    const headersClone = ctx.headers ? this.deepClone(ctx.headers) : {};
+    
     this.normalizeInput(bodyClone);
     this.normalizeInput(queryClone);
+    this.normalizeInput(headersClone);
+    
+    // Process HTTP headers for XSS payloads
+    this.processHeaders(ctx, headersClone, result);
+    
     // Process all potential XSS vectors based on config
     if (this.config.inlineEventHandlers) {
       this.processJavaScriptContext(ctx, bodyClone, queryClone, result);
@@ -194,13 +198,154 @@ export class XssModule implements SnafModule {
       ) {
         return {
           action: "sanitize",
-          sanitized: { body: bodyClone, query: queryClone },
+          sanitized: { 
+            body: bodyClone, 
+            query: queryClone,
+            headers: headersClone  // Include sanitized headers
+          },
           reason: `XSS sanitized: ${result.vectors.join(", ")} (Severity: ${result.severity})`,
         };
       }
     }
 
     return { action: "allow" };
+  }
+
+  // Process HTTP headers for XSS payloads
+  private processHeaders(
+    _ctx: SnafContext,
+    headersClone: any,
+    result: XssDetectionResult
+  ): void {
+    // Headers that commonly might contain XSS payloads
+    const sensitiveHeaders = [
+      'user-agent',
+      'referer',
+      'origin',
+      'x-forwarded-for',
+      'cookie',
+      'x-requested-with'
+    ];
+
+    // Process sensitive headers with all pattern types
+    for (const header of sensitiveHeaders) {
+      if (headersClone[header]) {
+        // Process each context type for this header
+        this.processHeaderPatterns(headersClone, header, result);
+      }
+    }
+
+    // Process all headers for high-risk patterns
+    for (const header in headersClone) {
+      this.checkHeaderForDangerousPatterns(headersClone, header, result);
+    }
+  }
+
+  // Process all pattern types for a specific header
+  private processHeaderPatterns(
+    headersClone: any,
+    header: string,
+    result: XssDetectionResult
+  ): void {
+    // Apply all pattern types to headers
+    const contextTypes = ['javascript', 'html', 'url', 'css', 'evasion'];
+    
+    for (const contextType of contextTypes) {
+      const patterns = XSS_PATTERNS[contextType as keyof typeof XSS_PATTERNS];
+      
+      for (const [key, pattern] of Object.entries(patterns)) {
+        this.checkAndSanitizeHeader(
+          headersClone, 
+          header, 
+          pattern, 
+          `${contextType}-${key}-header`, 
+          result,
+          contextType === 'evasion' // Only check without sanitizing for evasion patterns
+        );
+      }
+    }
+
+    // Process custom patterns
+    for (let i = 0; i < this.customPatterns.length; i++) {
+      this.checkAndSanitizeHeader(
+        headersClone,
+        header,
+        this.customPatterns[i],
+        `custom-pattern-${i}-header`,
+        result
+      );
+    }
+  }
+
+  // Check headers for particularly dangerous patterns
+  private checkHeaderForDangerousPatterns(
+    headersClone: any,
+    header: string,
+    result: XssDetectionResult
+  ): void {
+    // Critical patterns that should never appear in headers
+    const dangerousPatterns = [
+      /<script\b[^>]*>[\s\S]*?<\/script>/gi,
+      /javascript:/gi,
+      /data:text\/html/gi,
+      /(\bon\w+\s*=)/gi,
+      /document\./gi
+    ];
+    
+    for (let i = 0; i < dangerousPatterns.length; i++) {
+      this.checkAndSanitizeHeader(
+        headersClone,
+        header,
+        dangerousPatterns[i],
+        `dangerous-pattern-${i}-header`,
+        result
+      );
+    }
+  }
+
+  // Check and sanitize a specific header
+  private checkAndSanitizeHeader(
+    headers: any,
+    headerName: string,
+    pattern: RegExp,
+    vectorName: string,
+    result: XssDetectionResult,
+    justCheck: boolean = false
+  ): void {
+    if (!headers || !headers[headerName] || typeof headers[headerName] !== 'string') return;
+    
+    const value = headers[headerName];
+    const matches = value.match(pattern);
+    
+    if (matches && matches.length > 0) {
+      result.detected = true;
+      result.count += matches.length;
+      if (!result.vectors.includes(vectorName)) {
+        result.vectors.push(vectorName);
+      }
+      
+      // Add the header context
+      result.contexts.add('header');
+      
+      // Extract context type from vector name (e.g., js-eventHandlers-header → javascript)
+      const contextType = vectorName.split('-')[0];
+      if (['js', 'html', 'url', 'css'].includes(contextType)) {
+        result.contexts.add(contextType === 'js' ? 'javascript' : contextType);
+      }
+      
+      // Sanitize by removing the malicious content
+      if (!justCheck) {
+        const original = headers[headerName];
+        headers[headerName] = headers[headerName].replace(pattern, '');
+        
+        // Track sanitized fields with header: prefix for clarity
+        const fieldKey = `header:${headerName}`;
+        result.sanitizedFields[fieldKey] = {
+          original,
+          sanitized: headers[headerName]
+        };
+      }
+    }
   }
 
   private isWhitelisted(ctx: SnafContext): boolean {
@@ -230,12 +375,19 @@ export class XssModule implements SnafModule {
   }
 
   private calculateSeverity(result: XssDetectionResult): void {
-    // Determine severity based on detection context and count
-    if (result.contexts.has("javascript") && result.count > 5) {
+    // Update severity calculation to include header context
+    if (result.contexts.has('javascript') && result.count > 5) {
       result.severity = "critical";
-    } else if (result.contexts.has("javascript") || result.count > 10) {
+    } else if (
+      result.contexts.has('javascript') || 
+      result.count > 10 || 
+      (result.contexts.has('header') && result.count > 3)
+    ) {
       result.severity = "high";
-    } else if (result.contexts.has("html") && result.count > 3) {
+    } else if (
+      result.contexts.has('html') && result.count > 3 || 
+      result.contexts.has('header')
+    ) {
       result.severity = "medium";
     } else {
       result.severity = "low";
