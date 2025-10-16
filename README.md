@@ -3,7 +3,6 @@
 A lightweight, accurate, multi-framework XSS scanner for Node.js applications.
 
 [![npm](https://img.shields.io/npm/v/snaf)](https://www.npmjs.com/package/snaf)
-![npm](https://img.shields.io/npm/dw/snaf)
 ![License](https://img.shields.io/github/license/sarp75/snaf)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)
 [![Issues](https://img.shields.io/github/issues/sarp75/snaf)](https://github.com/sarp75/snaf/issues)
